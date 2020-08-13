@@ -13,6 +13,7 @@ if not os.path.exists('./dataset_catdog/dataset'): # if none exists.
     os.makedirs('./dataset_catdog/dataset')
 data_path = "./dataset_catdog/dataset"
 
+
 #Folders to be created
 datasets = ["training", "test", "validation"]
 datatypes = ["cats", "dogs"]

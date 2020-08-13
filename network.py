@@ -13,12 +13,17 @@ from tensorflow.keras import layers, Sequential, callbacks, regularizers
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 import matplotlib.pyplot as plt
+import os
 
 from tensorboard import program
+
+models_dir = "./models" # Directory for saving models
+if not os.path.exists(models_dir): # No need to make dir if it exists
+    os.makedirs(models_dir) # Make dir
+
 tb = program.TensorBoard()
 tb.configure(argv=[None, '--logdir', "localhost:8888"])
 url = tb.launch()
-
 
 import datetime             # datetime module that can handle readable strings for TensorBoard.
 # Create logging and tensorboard callback
@@ -52,6 +57,11 @@ validationGenerator = img.flow_from_directory(
     shuffle=True,
     batch_size= 32
     )
+
+testGenerator = img.flow_from_directory(
+    directory='./dataset_catdog/dataset/test',
+    target_size = (150,150)
+)
 
 # Uses matplotlib to print viz of data fed to the model
 image=trainGenerator.next()
@@ -150,12 +160,14 @@ model.compile(
 # Fitting model
 with tf.device("/device:GPU:0"): # Following piece of code is to run on GPU
     model.fit(
-        trainGenerator,                  # Model to train
+        trainGenerator,                         # Model to train
         validation_data=(validationGenerator),  # Data on which to evaluate the loss at end of epochs
-        epochs=100,                             # no. of epochs
+        epochs=10,                             # no. of epochs
         verbose=1,                              # Amount of information during run. 1 is progress bar
         callbacks=[callback, tensorboard_callback]                    # list of callbacks to do in between epochs
         )
+    model_name = "my_model-"+datetime.datetime.now().strftime("%Y%m%d-%H%M%S")+".h5"
+    model.save(f"{models_dir}/{model_name}")
 
 # Task 4 - Visualizing your results
 # Below taken from: https://keras.io/examples/vision/image_classification_from_scratch/
