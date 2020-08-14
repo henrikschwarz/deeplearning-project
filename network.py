@@ -66,16 +66,16 @@ testGenerator = img.flow_from_directory(
 # Uses matplotlib to print viz of data fed to the model
 image=trainGenerator.next()
 
-print(image[1])
-plt.subplot(221)
-plt.imshow(image[0][0])
-plt.subplot(222)
-plt.imshow(image[0][1])
-plt.subplot(223)
-plt.imshow(image[0][2])
-plt.subplot(224)
-plt.imshow(image[0][3])
-plt.show()
+# print(image[1])
+# plt.subplot(221)
+# plt.imshow(image[0][0])
+# plt.subplot(222)
+# plt.imshow(image[0][1])
+# plt.subplot(223)
+# plt.imshow(image[0][2])
+# plt.subplot(224)
+# plt.imshow(image[0][3])
+# plt.show()
 
 # Task 3 - Constructing the network
 #   A Convolutional Neural Networks (CNN) is used in this binary image classification project.
@@ -129,29 +129,26 @@ model.add(layers.Conv2D(
     input_shape=(150,150,3))    # image_size 150x150pixels x3 RGB colour
     )
 
-# model.add(layers.Dense(64, activation='relu'))
-model.add(layers.MaxPooling2D((2,2)))                   # Pooling the input from .conv2d
-model.add(layers.Conv2D(128,(3,3), activation='relu'))
-# model.add(layers.Dense(64, activation='relu'))
-model.add(layers.MaxPooling2D((2,2)))
-# model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Conv2D(256,(3,3), activation='relu'))
-model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Conv2D(512,(3,3), activation='relu'))
-model.add(layers.MaxPooling2D((2,2)))
-model.add(layers.Flatten())                             # Vectorizes I/O
+model= Sequential()
+model.add(layers.Conv2D(32,(3,3), activation='relu',input_shape=(150,150,3), kernel_regularizer=regularizers.l2(0.0001))) # 32 filters,
+model.add(layers.MaxPooling2D(2,2))
+model.add(layers.Dropout(0.5))
 
-#
-model.add(layers.Dense(32,activation='relu'))           # Fully connected layer (FFN) takes input from the former convolution
-model.add(layers.Dense(1, activation='sigmoid'))        # Output layer for binary classification
-model.summary()                                         # prints layers, output shape and params
+model.add(layers.Conv2D(64,(3,3), activation='relu')) # 32 filters,
+model.add(layers.MaxPooling2D(2,2))
+model.add(layers.Dropout(0.5))
 
-# Compiling model
-model.compile(
-    optimizer='adam',           # utilizes the ADAM adaptive learning rate
-    loss='binary_crossentropy', # the loss function
-    metrics=['acc']             # Measures model accuracy
-    )
+model.add(layers.Flatten())
+model.add(layers.Dense(32,activation='relu', kernel_regularizer=regularizers.l2(0.0001)))
+model.add(layers.Dropout(0.5))
+model.add(layers.Dense(16,activation='relu')) #acc 0,99 val acc 0,7
+model.add(layers.Dense(1, activation='sigmoid'))
+
+
+
+#model.summary() # prints fx params.
+
+model.compile(optimizer='adam',  loss='binary_crossentropy', metrics=['acc'])
 
 
 
